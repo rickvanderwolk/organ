@@ -25,6 +25,11 @@ const float SPAWN_SIZE = 10.0;        // Initial blob size
 const float SHRINK_RATE = 0.97;       // How fast blobs shrink
 const float TRIGGER_THRESHOLD = 0.3;  // Audio level to spawn blob (0-1)
 
+// Color mode
+//   0 = random: each blob gets a random color
+//   1 = frequency: blob color based on dominant frequency (bass=red, treble=purple)
+const int COLOR_MODE = 1;
+
 // ============================================================================
 // HARDWARE
 // ============================================================================
@@ -48,18 +53,24 @@ ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, SAMPLES, SAMPLE_FREQ);
 float audioLevel = 0;
 float audioPeak = 100;
 float lastAudioLevel = 0;
+int dominantBand = 0;  // Which frequency band is loudest
 
 // ============================================================================
-// BLOB COLORS
+// FREQUENCY BANDS
 // ============================================================================
 
-const uint32_t BLOB_COLORS[6] = {
-  0xFF0040,  // Pink-red
-  0xFF4000,  // Orange
-  0xFFAA00,  // Yellow-orange
-  0xFF0080,  // Magenta
-  0xFF2000,  // Red-orange
-  0xFF6000   // Orange
+const int NUM_BANDS = 6;
+float bandLevels[NUM_BANDS];
+float bandPeaks[NUM_BANDS] = {100, 100, 100, 100, 100, 100};  // Per-band peak tracking
+
+// Colors per frequency band (bass → treble)
+const uint32_t BAND_COLORS[NUM_BANDS] = {
+  0xFF0000,  // Bass:      Red
+  0xFF4400,  // Low-mid:   Orange
+  0xFFAA00,  // Mid:       Yellow
+  0x44FF00,  // High-mid:  Green
+  0x0088FF,  // High:      Blue
+  0x8800FF   // Treble:    Purple
 };
 
 // ============================================================================
@@ -76,7 +87,6 @@ struct Blob {
 };
 
 Blob blobs[MAX_BLOBS];
-int nextColor = 0;
 
 // ============================================================================
 // SETUP
@@ -123,6 +133,40 @@ void analyzeAudio() {
   FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);
   FFT.compute(FFTDirection::Forward);
   FFT.complexToMagnitude();
+
+  // Split into 6 frequency bands
+  // Bins: 1-2 (bass), 3-4, 5-7, 8-11, 12-18, 19-31 (treble)
+  const int bandBins[NUM_BANDS + 1] = {1, 3, 5, 8, 12, 19, 32};
+
+  float maxBandLevel = 0;
+  dominantBand = 0;
+
+  for (int b = 0; b < NUM_BANDS; b++) {
+    bandLevels[b] = 0;
+    for (int i = bandBins[b]; i < bandBins[b + 1]; i++) {
+      bandLevels[b] += vReal[i];
+    }
+    bandLevels[b] /= (bandBins[b + 1] - bandBins[b]);
+
+    // Update per-band peak (adaptive)
+    if (bandLevels[b] > bandPeaks[b]) {
+      bandPeaks[b] = bandLevels[b];
+    } else {
+      bandPeaks[b] = bandPeaks[b] * 0.995 + 50 * 0.005;  // Slow decay
+    }
+
+    // Normalize to 0-1 based on own peak, then find dominant
+    float normalizedLevel = 0;
+    if (bandPeaks[b] > 50) {
+      normalizedLevel = (bandLevels[b] - 50) / (bandPeaks[b] - 50);
+      normalizedLevel = constrain(normalizedLevel, 0, 1);
+    }
+
+    if (normalizedLevel > maxBandLevel) {
+      maxBandLevel = normalizedLevel;
+      dominantBand = b;
+    }
+  }
 
   // Get overall audio level
   float audio = 0;
@@ -200,8 +244,11 @@ void spawnBlob(float intensity) {
     blobs[slot].size = SPAWN_SIZE * (0.7 + intensity * 0.5);
     blobs[slot].brightness = 0.5 + intensity * 0.5;
     blobs[slot].drift = (random(0, 2) == 0 ? -1 : 1) * DRIFT_SPEED * (0.5 + random(0, 100) / 100.0);
-    blobs[slot].colorIndex = nextColor;
-    nextColor = (nextColor + 1) % 6;
+    if (COLOR_MODE == 0) {
+      blobs[slot].colorIndex = random(0, NUM_BANDS);  // Random color
+    } else {
+      blobs[slot].colorIndex = dominantBand;  // Frequency-based color
+    }
   }
 }
 
@@ -252,7 +299,7 @@ void renderBlobs() {
     float size = blobs[b].size;
     float center = blobs[b].position;
     float brightness = blobs[b].brightness;
-    uint32_t color = BLOB_COLORS[blobs[b].colorIndex];
+    uint32_t color = BAND_COLORS[blobs[b].colorIndex];
 
     int startLed = max(0, (int)(center - size));
     int endLed = min(NUM_LEDS - 1, (int)(center + size));

@@ -10,11 +10,30 @@ Lava lamp style visualizer - smooth floating blobs that react to audio.
 
 ## How It Works
 
-1. Multiple "blobs" float across the strip
-2. Each blob has soft edges (fades smoothly)
-3. Audio makes blobs expand, brighten, and move faster (real-time)
-4. Colors blend where blobs overlap
-5. Smooth, hypnotic lava lamp effect
+1. Audio spike instantly spawns a blob
+2. Blob slowly fades out, shrinks, and drifts
+3. Colors blend where blobs overlap
+4. Real-time trigger + smooth lava-like trail
+
+## Color Modes
+
+Set `COLOR_MODE` to choose:
+
+- `0` = **Random:** each blob gets a random color
+- `1` = **Frequency:** blob color based on dominant frequency (default)
+
+### Frequency Mode Colors
+
+| Frequency | Color |
+|-----------|-------|
+| Bass | Red |
+| Low-mid | Orange |
+| Mid | Yellow |
+| High-mid | Green |
+| High | Blue |
+| Treble | Purple |
+
+Kick drums create red blobs, hi-hats create blue/purple blobs.
 
 ## Wiring
 
@@ -31,23 +50,24 @@ LED GND         →  GND
 |-----------|-------------|---------|
 | `BRIGHTNESS` | LED brightness (0-255) | 100 |
 | `NUM_LEDS` | Total LEDs on your strip | 120 |
-| `NUM_BLOBS` | Number of blobs (3-5 works well) | 4 |
-| `BASE_SPEED` | Base movement speed | 0.3 |
-| `BASE_SIZE` | Base blob size in LEDs | 6.0 |
-| `AUDIO_EXPAND` | How much audio expands blobs | 12.0 |
-| `AUDIO_SPEED` | How much audio speeds up movement | 0.5 |
-| `AUDIO_BRIGHTNESS` | How much audio affects brightness | 0.8 |
+| `MAX_BLOBS` | Max simultaneous blobs | 8 |
+| `TRIGGER_THRESHOLD` | Audio level to spawn blob (0-1) | 0.3 |
+| `SPAWN_SIZE` | Initial blob size | 10.0 |
+| `FADE_RATE` | How fast blobs fade (lower = faster) | 0.92 |
+| `SHRINK_RATE` | How fast blobs shrink | 0.97 |
+| `DRIFT_SPEED` | How fast blobs drift | 0.3 |
+| `COLOR_MODE` | Color mode (see above) | 1 |
 
-## Blob Colors
+## Customization
 
-Default warm lava colors (pink, orange, yellow, magenta). Edit `BLOB_COLORS` array to customize.
+Edit `BAND_COLORS` array to change the available colors (used by both modes).
 
 ## Troubleshooting
 
-**Blobs too fast:** Decrease `BASE_SPEED`
+**Blobs spawn too often:** Increase `TRIGGER_THRESHOLD`
 
-**Not reacting to audio:** Increase `AUDIO_EXPAND` and `AUDIO_BRIGHTNESS`
+**Not reacting to audio:** Decrease `TRIGGER_THRESHOLD`
 
-**Too chaotic:** Reduce `NUM_BLOBS` or `AUDIO_EXPAND`
+**Fading too fast:** Increase `FADE_RATE` (closer to 1.0)
 
-**Too subtle:** Increase `AUDIO_EXPAND` and `AUDIO_BRIGHTNESS`
+**Colors mostly one color (frequency mode):** The system auto-calibrates - give it a few seconds to adapt. Or try `COLOR_MODE = 0` for random colors.
