@@ -94,7 +94,7 @@ const bool BAND_ENABLED[8] = {
 };
 
 // ============================================================================
-// COLORS - Cyberpunk palette
+// COLORS
 // ============================================================================
 
 // Hex color code per band (0xRRGGBB)
@@ -108,11 +108,6 @@ const uint32_t COLORS[8] = {
   0xFF0088,  // Band 6: Hot pink
   0xFF0044   // Band 7: Pink-red
 };
-
-// Other palette ideas:
-// Fire:     0xFF0000, 0xFF2200, 0xFF4400, 0xFF6600, 0xFF8800, 0xFFAA00, 0xFFCC00, 0xFFFF00
-// Ocean:    0x000033, 0x000066, 0x000099, 0x0000CC, 0x0033FF, 0x0066FF, 0x0099FF, 0x00CCFF
-// Rainbow:  0xFF0000, 0xFF7F00, 0xFFFF00, 0x00FF00, 0x0000FF, 0x4B0082, 0x9400D3, 0xFF1493
 
 // ============================================================================
 // HARDWARE - Adjust for your setup

@@ -47,19 +47,6 @@ LED GND         →  GND
 | `THRESHOLD` | Activation threshold 0-1 | 0.70 |
 | `COLORS[8]` | Color per band (hex 0xRRGGBB) | Cyberpunk |
 
-## Color Palettes
-
-```cpp
-// Cyberpunk (default)
-0x0044FF, 0x2200FF, 0x6600FF, 0x9900FF, 0xCC00FF, 0xFF00CC, 0xFF0088, 0xFF0044
-
-// Fire
-0xFF0000, 0xFF2200, 0xFF4400, 0xFF6600, 0xFF8800, 0xFFAA00, 0xFFCC00, 0xFFFF00
-
-// Ocean
-0x000033, 0x000066, 0x000099, 0x0000CC, 0x0033FF, 0x0066FF, 0x0099FF, 0x00CCFF
-```
-
 ## Troubleshooting
 
 **LEDs flicker during silence:** Increase `BAND_NOISE` values
