@@ -29,6 +29,7 @@ LED GND         →  GND
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `BRIGHTNESS` | LED brightness (0-255) | 100 |
 | `NUM_LEDS` | Total LEDs on your strip | 120 |
 | `RESOLUTION` | Skip LEDs (see below) | 4 |
 | `SENSITIVITY` | Higher = more sensitive | 1.5 |

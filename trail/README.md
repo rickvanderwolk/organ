@@ -42,9 +42,12 @@ LED GND         →  GND
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `BRIGHTNESS` | LED brightness (0-255) | 100 |
+| `NUM_LEDS` | Total LEDs on your strip | 120 |
 | `SCROLL_MS` | Scroll speed in ms (lower = faster) | 50 |
 | `FADE_AMOUNT` | Fade factor 0-1 (lower = faster fade) | 0.92 |
 | `THRESHOLD` | Activation threshold 0-1 | 0.70 |
+| `USE_INTENSITY` | Brightness varies with volume | true |
 | `COLORS[8]` | Color per band (hex 0xRRGGBB) | Cyberpunk |
 
 ## Troubleshooting
