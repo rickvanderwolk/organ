@@ -7,6 +7,7 @@ Real-time audio visualizers for Arduino (or compatible) and NeoPixel/WS2812B LED
 - **[lava](lava/)** - Lava lamp style floating blobs
 - **[spectrum](spectrum/)** - Real-time frequency equalizer
 - **[trail](trail/)** - Scrolling visualizer with fading history
+- **combo** - All three combined with automatic switching
 
 ## Hardware
 
